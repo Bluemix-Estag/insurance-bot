@@ -22,7 +22,7 @@ var appEnvOpts = {};
 
 var conversationWorkspace, conversation;
 
-fs.stat('./vcap-local.json', function(err, stat) {
+fs.stat('./vcap-local.json', function (err, stat) {
     if (err && err.code === 'ENOENT') {
         // file does not exist
         console.log('No vcap-local.json');
@@ -70,13 +70,13 @@ var Logs;
 function initCloudant() {
     var cloudantURL = appEnv.services.cloudantNoSQLDB[0].credentials.url || appEnv.getServiceCreds("insurance-bot-db").url;
     var Cloudant = require('cloudant')({
-      url: cloudantURL,
-      plugin: 'retry',
-      retryAttempts: 10,
-      retryTimeout: 500
+        url: cloudantURL,
+        plugin: 'retry',
+        retryAttempts: 10,
+        retryTimeout: 500
     });
     // Create the accounts Logs if it doesn't exist
-    Cloudant.db.create(dbname, function(err, body) {
+    Cloudant.db.create(dbname, function (err, body) {
         if (err) {
             console.log("Database already exists: ", dbname);
         } else {
@@ -111,38 +111,38 @@ function initConversation() {
 
     // if not, look it up by name or create one
     if (!conversationWorkspace) {
-      const workspaceName = 'Ana';
-      console.log('No conversation workspace configured in the environment.');
-      console.log(`Looking for a workspace named '${workspaceName}'...`);
-      conversation.listWorkspaces((err, result) => {
-        if (err) {
-          console.log('Failed to query workspaces. Conversation will not work.', err);
-        } else {
-          const workspace = result.workspaces.find(workspace => workspace.name === workspaceName);
-          if (workspace) {
-            conversationWorkspace = workspace.workspace_id;
-            console.log("Using Watson Conversation with username", conversationUsername, "and workspace", conversationWorkspace);
-          } else {
-            console.log('Importing workspace from ./conversation/Ana.json');
-            // create the workspace
-            const anaWorkspace = JSON.parse(fs.readFileSync('./conversation/Ana.json'));
-            // force the name to our expected name
-            anaWorkspace.name = workspaceName;
-            conversation.createWorkspace(anaWorkspace, (createErr, workspace) => {
-              if (createErr) {
-                console.log('Failed to create workspace', err);
-              } else {
-                conversationWorkspace = workspace.workspace_id;
-                console.log(`Successfully created the workspace '${workspaceName}'`);
-                console.log("Using Watson Conversation with username", conversationUsername, "and workspace", conversationWorkspace);
-              }
-            });
-          }
-        }
-      });
+        const workspaceName = 'Ana PORTUGUES';
+        console.log('No conversation workspace configured in the environment.');
+        console.log(`Looking for a workspace named '${workspaceName}'...`);
+        conversation.listWorkspaces((err, result) => {
+            if (err) {
+                console.log('Failed to query workspaces. Conversation will not work.', err);
+            } else {
+                const workspace = result.workspaces.find(workspace => workspace.name === workspaceName);
+                if (workspace) {
+                    conversationWorkspace = workspace.workspace_id;
+                    console.log("Using Watson Conversation with username", conversationUsername, "and workspace", conversationWorkspace);
+                } else {
+                    console.log('Importing workspace from ./conversation/Ana.json');
+                    // create the workspace
+                    const anaWorkspace = JSON.parse(fs.readFileSync('./conversation/Ana.json'));
+                    // force the name to our expected name
+                    anaWorkspace.name = workspaceName;
+                    conversation.createWorkspace(anaWorkspace, (createErr, workspace) => {
+                        if (createErr) {
+                            console.log('Failed to create workspace', err);
+                        } else {
+                            conversationWorkspace = workspace.workspace_id;
+                            console.log(`Successfully created the workspace '${workspaceName}'`);
+                            console.log("Using Watson Conversation with username", conversationUsername, "and workspace", conversationWorkspace);
+                        }
+                    });
+                }
+            }
+        });
     } else {
-      console.log('Workspace ID was specified as an environment variable.');
-      console.log("Using Watson Conversation with username", conversationUsername, "and workspace", conversationWorkspace);
+        console.log('Workspace ID was specified as an environment variable.');
+        console.log("Using Watson Conversation with username", conversationUsername, "and workspace", conversationWorkspace);
     }
 }
 
@@ -151,11 +151,11 @@ function initConversation() {
 // =====================================
 // Allow clients to interact with Ana
 var chatbot = {
-    sendMessage: function(req, callback) {
+    sendMessage: function (req, callback) {
         var userPolicy = req.session.userPolicy;
         var owner = req.user.username;
 
-        buildContextObject(req, function(err, params) {
+        buildContextObject(req, function (err, params) {
 
             if (err) {
                 console.log("Error in building the parameters object: ", err);
@@ -177,12 +177,12 @@ var chatbot = {
                 };
 
                 chatLogs(owner, conv, res, () => {
-                  return callback(null, res);
+                    return callback(null, res);
                 });
 
             } else if (params) {
                 // Send message to the conversation service with the current context
-                conversation.message(params, function(err, data) {
+                conversation.message(params, function (err, data) {
 
                     if (err) {
                         console.log("Error in sending message: ", err);
@@ -192,14 +192,14 @@ var chatbot = {
 
                     console.log("Got response from Ana: ", JSON.stringify(data));
 
-                    updateContextObject(data, userPolicy, function(err, res) {
+                    updateContextObject(data, userPolicy, function (err, res) {
 
                         if (data.context.system.dialog_turn_counter > 1) {
                             chatLogs(owner, conv, res, () => {
-                              return callback(null, res);
+                                return callback(null, res);
                             });
                         } else {
-                          return callback(null, res);
+                            return callback(null, res);
                         }
                     });
                 });
@@ -237,7 +237,7 @@ function chatLogs(owner, conversation, response, callback) {
         selector: {
             'conversation': conversation
         }
-    }, function(err, result) {
+    }, function (err, result) {
         if (err) {
             console.log("Couldn't find logs.");
             callback(null);
@@ -257,7 +257,7 @@ function chatLogs(owner, conversation, response, callback) {
 
                 doc.logs.push(logFile);
 
-                Logs.insert(doc, function(err, body) {
+                Logs.insert(doc, function (err, body) {
                     if (err) {
                         console.log("There was an error creating the log: ", err);
                     } else {
@@ -269,7 +269,7 @@ function chatLogs(owner, conversation, response, callback) {
                 doc.lastContext = response.context;
                 doc.logs.push(logFile);
 
-                Logs.insert(doc, function(err, body) {
+                Logs.insert(doc, function (err, body) {
                     if (err) {
                         console.log("There was an error updating the log: ", err);
                     } else {
@@ -398,7 +398,7 @@ function buildContextObject(req, callback) {
             lname: req.user.lname
         };
 
-        parsePolicyTitles(userPolicy, function(services, procedures) {
+        parsePolicyTitles(userPolicy, function (services, procedures) {
             params.context.services = services;
             params.context.procedures = procedures;
         });
@@ -426,7 +426,7 @@ function parsePolicyTitles(doc, callback) {
     var policyProcedures = [];
     var proc = [];
 
-    policies.forEach(function(policy) {
+    policies.forEach(function (policy) {
 
         if (policy.type === currentService) {
             proc.push(policy.title);
@@ -479,10 +479,16 @@ function updateContextObject(response, userPolicy, callback) {
         var procedureList;
 
         console.log("Service: ", service);
+        console.log("Services aqui: " + JSON.stringify(services));
 
         var i = services.indexOf(service);
-        procedureList = procedures[i].join(", ");
-        context.procedureList = procedureList;
+        if (procedures[i] == undefined) {
+            procedureList = " ";
+            context.procedureList = procedureList;
+        } else {
+            procedureList = procedures[i].join(", ");
+            context.procedureList = procedureList;
+        }
     }
 
     // Store the user selected procedure to query and create object of details

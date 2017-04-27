@@ -6,11 +6,11 @@
         "label": "cloudantNoSQLDB",
         "plan": "Lite",
         "credentials": {
-            "username": "",
-            "password": "",
-            "host": "",
+            "username": "c0b01ed1-522f-4a03-b533-676fecbd9f3f-bluemix",
+            "password": "157e8621eece2b43befa893c428056457b1899a7b2f360e59fbe98883eef68c9",
+            "host": "c0b01ed1-522f-4a03-b533-676fecbd9f3f-bluemix.cloudant.com",
             "port": 443,
-            "url": ""
+            "url": "https://c0b01ed1-522f-4a03-b533-676fecbd9f3f-bluemix:157e8621eece2b43befa893c428056457b1899a7b2f360e59fbe98883eef68c9@c0b01ed1-522f-4a03-b533-676fecbd9f3f-bluemix.cloudant.com"
             }
       }
     ],
@@ -20,8 +20,8 @@
         "name": "insurance-bot-conversation",
         "credentials": {
             "url": "https://gateway.watsonplatform.net/conversation/api",
-            "password": "",
-            "username": ""
+            "password": "f0cd275b-027b-46eb-8788-374cb98d3ef8",
+            "username": "IJE2bEbgWm3u"
         }
       }
     ]
